@@ -123,7 +123,7 @@ specify the following:
   (let [shafmt (if long-sha? "%H" "%h")
         fmt (str "--pretty=" shafmt ",%cd")
         path (get {"" "."} path path)
-        {:keys [out]} (git {:gitdir gitdir} "log" "-1" fmt path)
+        {:keys [out]} (git {:gitdir gitdir} "log" "-1" "--full-history" fmt path)
         _ (assert (seq out) "No committed changes?")
         [sha, datestr] (-> out s/trim (s/split #"," 2))
         ctime (Date. ^String datestr)]
@@ -993,10 +993,7 @@ This is provided for lein-voom developer debug usage."
 (defn file-path-merges
   [parents]
   (->> parents
-       (mapcat #(into #{} (mapcat sub-paths %)))
-       (reduce #(update-in % [%2] (fnil inc 0)) {})
-       (filter #(< 1 (val %)))
-       (map first)))
+       (mapcat #(into #{} (mapcat sub-paths %)))))
 
 (defn merged-paths
   [gitdir sha]
